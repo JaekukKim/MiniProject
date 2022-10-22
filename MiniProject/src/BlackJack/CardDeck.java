@@ -4,56 +4,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardDeck {
+	// 카드 덱은 총 52장이며 카드의 종류는 4종류, 1종류마다 13장이다. j q k 는 10이 넘어가나 10으로 값을 고정한다.
+	// 카드덱에선 카드에다가 무늬와 숫자를 매긴다. 즉 카드를 생성해야한다. 카드의 무늬와 숫자는 불변값이다.
+	// 카드를 생성만해선 안된다 카드를 보관할 변수가 필요하다.
+
 	public List<Card> cards;
-	private static final String[] PATTERN = { "SPADE", "DIAMOND", "HEART", "CLOVER" };
+	private static final String[] CARD_PATTERN = { "SPADE", "DIAMOND", "CLOVER", "HEART" };
 	private static final int CARD_NUM = 13;
-	private String pattern;
-	private String cardNum;
-	private int point;
+	// 카드 패턴과 카드 번호는 고유하며, 다른데서 건드릴 일 자체가 없다.
 
-	// 새로운 생성자를 만들어 카드의 번호가 10 이상일때 10으로 고정되게 해야한다.
-	public CardDeck(String pattern, String cardNum, int point) {
-		this.pattern = pattern;
-		this.cardNum = cardNum;
-		this.point = this.cardPoint(point);
-	}
-
+	// 카드는 한번 생성되고 변하지 않는다. 그럼 카드덱의 생성자에서 객체 생성과 동시에 초기화를 해 줄 수 있다.
 	public CardDeck() {
 		cards = new ArrayList<>();
-		// LinkedList로 인덱스 관리의 효율성을 높이는것도 좋지만 나는 블랙잭의 현실적인 규칙
-		// -> 패를 섞고 패는 맨 위에 있는것부터 배분 이라는 규칙에 철저히 의거해 자동으로 인덱스를 앞당겨주는 ArrayList를
-		// 사용하려고 한다.
+		// 카드들을 저장할 배열을 하나 만들어주었다. 그리고 카드를 생성한다.
 
-		for (String pattern : PATTERN) {
-			for (int cardNum = 1; cardNum <= CARD_NUM; cardNum++) {
-				Card card = new Card();
-				String num;
-				if (cardNum == 1) {
-					num = "A";
-				} else if (cardNum == 11) {
-					num = "J";
-				} else if (cardNum == 12) {
-					num = "Q";
-				} else if (cardNum == 13) {
-					num = "K";
-				} else {
-					num = String.valueOf(cardNum);
+		for (String pattern : CARD_PATTERN) {
+			for (int i = 1; i <= CARD_NUM; i++) {
+				String specialCard;
+				int coercionCardNum = i;
+
+				switch (i) {
+				case 1:
+					specialCard = "A";
+					break;
+				case 11:
+					specialCard = "J";
+					break;
+				case 12:
+					specialCard = "Q";
+					break;
+				case 13:
+					specialCard = "K";
+					break;
+				default:
+					specialCard = Integer.toString(i);
+					break;
 				}
-				card.setCardNum(num);
-				card.setCardKind(pattern);
-				cards.add(card);
 
+				if (i >= 11) {
+					coercionCardNum = 10;
+				} else {
+					coercionCardNum = i;
+				}
+
+				Card card = new Card(pattern, specialCard, coercionCardNum);
+				cards.add(card);
 			}
 		}
+
 	}
 
-	public int cardPoint(int number) {
-		if (number >= 11) {
-			number = 10;
-		}
-		return number;
+	public List<Card> getCards() {
+		return cards;
 	}
 
+	public void setCards(List<Card> cards) {
+		this.cards = cards;
+	}
+
+	// 테스트출력을 위한 메소드 오버라이딩.
 	@Override
 	public String toString() {
 		for (Card card : cards) {
