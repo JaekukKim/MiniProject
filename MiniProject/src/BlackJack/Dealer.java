@@ -2,9 +2,7 @@ package BlackJack;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 
 public class Dealer implements Participant {
 	// [1]딜러는 패를 받고, [2]패를 섞고, [3]패를 나눠준다. [4]모든 과정과 게임이 끝나면 카드를 오픈한다.
@@ -75,6 +73,18 @@ public class Dealer implements Participant {
 			this.receiveCard(card);
 		}
 	}
+	
+	// 딛러 버스트 구현
+	@Override
+	public void bust(Player player, Dealer dealer) {
+		if (dealer.printSumPoint() > BLACK_JACK_NUM){
+			System.out.println("\n딜러가 산산조각 나버렸구만! 자네의 승리라네!");
+			System.out.println("금액 획득! : " + player.playerMoney());
+			player.playerMoney += player.playerMoney();
+			System.out.println("현재 금액 : " + player.playerMoney());
+		}
+		
+	}
 
 	// 딜러의 카드의 총 합.
 	@Override
@@ -82,9 +92,15 @@ public class Dealer implements Participant {
 		int sum = 0;
 		for (Card card : cardDeck) {
 			sum += card.getCoercionCardNum();
+			if (card.getCoercionCardNum()%10 == 1) {
+				if ((sum+10)<=21) {
+					sum+=10;
+				}
+			}
+			
 		}
 		
-		System.out.print("\n딜러 카드의 총 합은? : " + sum);
+		System.out.print("\n딜러 카드의 총 합은? : " + sum + "\n");
 		return sum;
 	}
 
@@ -94,6 +110,11 @@ public class Dealer implements Participant {
 		int sum = 0;
 		for (Card card : cardDeck) {
 			sum += card.getCoercionCardNum();
+			if (card.getCoercionCardNum()%10 == 1) {
+				if ((sum+10)<=21) {
+					sum+=10;
+				}
+			}
 		}
 		return sum;
 	}

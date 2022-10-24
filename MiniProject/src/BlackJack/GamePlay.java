@@ -37,14 +37,15 @@ public class GamePlay {
 			Player player = new Player();
 			CardDeck cardDeck = new CardDeck();
 			Rules rules = new Rules();
+
 			while (true) {
 
-				System.out.println("게임을 시작하겠나?");
+				System.out.println("\n게임을 시작하겠나?");
 				System.out.println("1. 게임시작  2.런");
 				int num = sc.nextInt();
 				if (num == 1) {
 					System.out.println(
-							"규칙을 설명한다.\n1.딜러의 패는 게임이 끝날때까지 공개되지 않는다." + "\n2.딜러의 카드의 총 합이 16이하일경우 Hit, 아닐시 Stay.\n");
+							"규칙을 설명.\n1.딜러의 패는 게임이 끝날때까지 공개되지 않는다." + "\n2.딜러의 카드의 총 합이 16이하일경우 Hit, 아닐시 Stay.");
 					break;
 				} else if (num == 2) {
 					System.out.println("애송이로군");
@@ -54,22 +55,34 @@ public class GamePlay {
 				}
 
 			}
-			
-			player.betMoney(sc);
 
 			dealer.setCards(cardDeck.getCards());
 			dealer.shuffle();
-			rules.gameStart(player, dealer);
+
+			player.betMoney(sc);
+
+			// 22-10-24 첫턴에 블랙잭이 터지는지 확인하는 코드이다... 메소드 안에 같이 구현해볼려고 하는데 너무 어렵다. 리팩토링 예정
+
+			rules.gameStart(player, dealer, rules);
+			if (dealer.printSumPoint() == 21) {
+				break;
+			} else if (player.printSumPoint() == 21) {
+				break;
+			} // 첫턴 블랙잭 확인코드 끝
+
+			System.out.println("\n**딜러의 카드는 게임이 끝나고 나서 공개된다네, 행운을빈다네.**");
 
 			while (true) {
 				System.out.println("\n1.Hit   2.Stay");
 				int hitCase = sc.nextInt();
 				if (hitCase == 1) {
-					rules.hit(player, dealer);
-					if (player.printSumPoint() > 21) {
-						System.out.println("\n이런, 버스트가 나버렸구만, 아쉽지만 패배라네.");
+					player.hit(dealer);
+					dealer.hit();
+					if (player.printSumPoint()>21) {
+						System.out.println("버스트가 나버렸구만, 자네의 패배라네, 무리하지 말게나.");
 						break;
 					}
+
 				} else if (hitCase == 2) {
 					dealer.coercionHit();
 					break;
@@ -77,12 +90,7 @@ public class GamePlay {
 			}
 
 			System.out.println("\n==게임 결과창==");
-			player.openCard();
-			player.sumPoint();
-			dealer.openCard();
-			dealer.sumPoint();
-			
-			rules.judgmentBlackJack(player, dealer);
+
 			rules.gameWinner(player, dealer);
 
 		}
